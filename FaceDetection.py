@@ -1,14 +1,18 @@
 import cv2
 import mediapipe as mp
+import numpy as np
+from FacialExpression import FacialExpression
 
 class FaceDetection():
     def main(self):
         self.face_detection()
 
     def face_detection(self):
+        facial = FacialExpression() 
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_face_mesh = mp.solutions.face_mesh
+        detectoin = 0
  
         drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
         cap = cv2.VideoCapture(0)
@@ -31,10 +35,18 @@ class FaceDetection():
                 height, width, c = image.shape
                 if results.multi_face_landmarks:
                     for index, landmarks in enumerate(results.multi_face_landmarks):
-                        x, y = int(landmarks.landmark[33].x * width), int(landmarks.landmark[33].y * height)
-                        cv2.circle(image, (x,y), 5, (255,255,0))
-                        
+                        detectoin = facial.detect_expression(landmarks, width, height)
+                        # cv2.circle(image, (right_corner[0],right_corner[1]), 5, (255,255,0))
+                
+                
                 cv2.imshow('MediaPipe Face Mesh', cv2.flip(image, 1))
+                if detectoin == 1:
+                    print("smile")
+                elif detectoin == 4:
+                    print("suprised")
+                elif detectoin == 5:
+                    print("normal")
+                    
                 if cv2.waitKey(5) & 0xFF == 27:
                     break
         cap.release()

@@ -6,9 +6,11 @@ class FacialExpression():
 		left_corner		= np.array([landmarks.landmark[291].x * width, landmarks.landmark[291].y * height])
 		upper_mouth		= np.array([landmarks.landmark[13].x * width, landmarks.landmark[13].y * height])
 		lower_mouth		= np.array([landmarks.landmark[14].x * width, landmarks.landmark[14].y * height])
-		right_eye		= np.array([landmarks.landmark[133].x * width, landmarks.landmark[133].y * height])
-		left_eye		= np.array([landmarks.landmark[362].x * width, landmarks.landmark[362].y * height])
-		
+		right_eye_tip	= np.array([landmarks.landmark[133].x * width, landmarks.landmark[133].y * height])
+		left_eye_tip	= np.array([landmarks.landmark[362].x * width, landmarks.landmark[362].y * height])
+		right_eye_end	= np.array([landmarks.landmark[33].x * width, landmarks.landmark[33].y * height])
+		left_eye_end	= np.array([landmarks.landmark[263].x * width, landmarks.landmark[263].y * height])		
+
 		mid_x = (landmarks.landmark[107].x * width + landmarks.landmark[55].x * width) / 2
 		mid_y = (landmarks.landmark[107].y * height + landmarks.landmark[55].y * height) / 2
 		right_brow_tip = np.array([mid_x, mid_y])
@@ -23,8 +25,9 @@ class FacialExpression():
 		left_brow_end  = np.array([mid_x, mid_y])
 
 		#–Ú‚Æ”û‚Ì‹——£
-		dist_eye_brow = (np.linalg.norm(right_eye - right_brow_tip) + np.linalg.norm(left_eye - left_brow_tip)) / 2
-		
+		dist_eye_brow_tip = (np.linalg.norm(right_eye_tip - right_brow_tip) + np.linalg.norm(left_eye_tip - left_brow_tip)) / 2
+		dist_eye_brow_end = (np.linalg.norm(right_eye_end - right_brow_end) + np.linalg.norm(left_eye_end - left_brow_end)) / 2
+
 		#ŒûŠp
 		mid_corner = (right_corner + left_corner) / 2
 		dist_upper = np.linalg.norm(upper_mouth - mid_corner)
@@ -34,7 +37,7 @@ class FacialExpression():
 		height_mouth  = np.linalg.norm(upper_mouth - lower_mouth)
 		
 		#–ÚŠÔŠu
-		dist_eye  = np.linalg.norm(right_eye - left_eye)
+		dist_eye  = np.linalg.norm(right_eye_tip - left_eye_tip)
 		
 		#”ûŠÔŠu
 		dist_brow_tip  = np.linalg.norm(right_brow_tip - left_brow_tip)
@@ -47,9 +50,15 @@ class FacialExpression():
 
 		#•\î”»’è
 		#smile:1, angry:2, sad:3, surprised:4, other:5
-		if dist_lower > 20:
+
+		if dist_lower > 25:			
 			return 1
-		if height_mouth > 40 and dist_eye_brow > 45:
-			return 4
+		elif dist_eye_brow_end > 40:
+			if dist_eye_brow_tip > 40:
+				return 4
+		elif dist_eye_brow_tip < 25:
+			return 2
+		elif dist_eye_brow_tip > 35 or dist_brow_tip < 50:
+			return 3
 		else:
 			return 5

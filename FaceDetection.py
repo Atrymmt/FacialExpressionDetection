@@ -12,8 +12,10 @@ class FaceDetection():
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_face_mesh = mp.solutions.face_mesh
+        pre_deteciton = 0
         detectoin = 0
- 
+        count = 0 
+
         drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
         cap = cv2.VideoCapture(0)
         with mp_face_mesh.FaceMesh(
@@ -38,17 +40,29 @@ class FaceDetection():
                         detectoin = facial.detect_expression(landmarks, width, height)
                         # cv2.circle(image, (right_corner[0],right_corner[1]), 5, (255,255,0))
                 
-                
                 cv2.imshow('MediaPipe Face Mesh', cv2.flip(image, 1))
+                if cv2.waitKey(5) & 0xFF == 27:
+                    break
+                
+                if detectoin == pre_deteciton:
+                    count += 1
+                else:
+                    count = 0
+                
+                pre_deteciton = detectoin
+                if count < 30:
+                    continue
+
                 if detectoin == 1:
                     print("smile")
+                elif detectoin == 2:
+                    print("angry")
+                elif detectoin == 3:
+                    print("sad")
                 elif detectoin == 4:
                     print("suprised")
                 elif detectoin == 5:
                     print("normal")
-                    
-                if cv2.waitKey(5) & 0xFF == 27:
-                    break
         cap.release()
 
 if __name__ == "__main__":
